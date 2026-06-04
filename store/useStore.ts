@@ -55,6 +55,7 @@ interface AppState {
   startBreak: (minutes: number, phase: 'short-break' | 'long-break') => void;
   failPomodoro: () => void;
   completePomodoro: () => void;
+  completeBreak: () => void;
   setSelectedDuration: (minutes: number) => void;
 }
 
@@ -257,6 +258,7 @@ export const useStore = create<AppState>()(
               todaySessions: newTodaySessions,
               lastSessionDay: todayKey,
             },
+            // Always mark the linked task as completed when focus timer ends
             tasks: taskId
               ? state.tasks.map((t) =>
                   t.id === taskId ? { ...t, status: 'completed' } : t
@@ -264,6 +266,20 @@ export const useStore = create<AppState>()(
               : state.tasks,
           };
         }),
+
+      // Resets timer after a break ends — no task/stats update
+      completeBreak: () =>
+        set((state) => ({
+          pomodoro: {
+            ...state.pomodoro,
+            timeLeft: state.selectedDuration * 60,
+            isRunning: false,
+            isPaused: false,
+            phase: 'idle',
+            currentLinkedTaskId: null,
+            endTime: null,
+          },
+        })),
 
       setSelectedDuration: (minutes) =>
         set((state) => ({

@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import { Swipeable } from 'react-native-gesture-handler';
 import { useStore, TaskStatus } from '../../store/useStore';
-import * as Haptics from 'expo-haptics';
+
 
 const NEON = '#39FF14';
 
@@ -63,7 +63,6 @@ function TaskCard({ task, onToggle, onDelete, index }: TaskCardProps) {
   const renderRightAction = () => (
     <TouchableOpacity
       onPress={() => {
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
         swipeRef.current?.close();
         onDelete();
       }}
@@ -237,12 +236,8 @@ export default function TasksScreen() {
       return order[a.status] - order[b.status];
     });
 
-  const handleCreateTask = async () => {
-    if (!newTaskTitle.trim()) {
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      return;
-    }
-    await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+  const handleCreateTask = () => {
+    if (!newTaskTitle.trim()) return;
     addTask({
       title: newTaskTitle.trim(),
       description: newTaskDescription.trim() || undefined,
@@ -255,7 +250,6 @@ export default function TasksScreen() {
   };
 
   const handleToggle = (id: string, status: TaskStatus) => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     if (status === 'completed') updateTaskStatus(id, 'pending');
     else if (status === 'failed') updateTaskStatus(id, 'pending');
     else updateTaskStatus(id, 'completed');
@@ -277,7 +271,6 @@ export default function TasksScreen() {
 
           <TouchableOpacity
             onPress={() => {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
               setModalVisible(true);
             }}
             style={{
@@ -328,7 +321,7 @@ export default function TasksScreen() {
           return (
             <TouchableOpacity
               key={cat}
-              onPress={() => { Haptics.selectionAsync(); setActiveCategory(cat); }}
+              onPress={() => { setActiveCategory(cat); }}
               style={{
                 paddingHorizontal: 18,
                 paddingVertical: 9,
@@ -462,7 +455,7 @@ export default function TasksScreen() {
                 return (
                   <TouchableOpacity
                     key={cat}
-                    onPress={() => { Haptics.selectionAsync(); setNewTaskCategory(cat); }}
+                    onPress={() => { setNewTaskCategory(cat); }}
                     style={{
                       paddingHorizontal: 16,
                       paddingVertical: 8,
